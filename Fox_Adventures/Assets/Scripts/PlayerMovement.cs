@@ -34,9 +34,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        booster();
+        booster(); 
+        Touchinput();
         playerAnimation();
-        playerMovement();
+        //playerMovement();
         playerFallDown();
     }
     private void FixedUpdate()
@@ -58,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
     private void playerMovement()
     {
         playerCanMove = FindAnyObjectByType<GameManager>().playerAlive;
-        if (UnityEngine.Application.platform == RuntimePlatform.Android)
+        if (UnityEngine.Application.platform == RuntimePlatform.WindowsEditor)
         {
             Touchinput();
             return;
@@ -68,11 +69,11 @@ public class PlayerMovement : MonoBehaviour
             horizontalInput = Input.GetAxisRaw("Horizontal");
             if (Input.GetButtonDown("Jump") && IsGrounded())
             {
-                rb.velocity = new Vector2(rb.velocity.x, jumpHight * jumpBoost);
+                rb.velocity = new Vector2(rb.velocity.x, jumpHight  * jumpBoost);
             }
             if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
             {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+               rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
             }
         }
     }
@@ -184,11 +185,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Touchinput()
+    private void Touchinput()
     {
+        horizontalInput = 0f;
+
         foreach (Touch touch in Input.touches)
         {
-            if (touch.position.x < screenWitdh / 3 )
+            
+            playerCanMove = FindAnyObjectByType<GameManager>().playerAlive;
+            if (touch.position.x < screenWitdh / 3f)
             {
                 //jump
                 if (IsGrounded())
@@ -197,16 +202,19 @@ public class PlayerMovement : MonoBehaviour
                 }
                 if (rb.velocity.y > 0f)
                 {
-                    rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+                   //rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
                 }
             }
-            if (touch.position.x  > screenWitdh/3 && touch.position.x < screenWitdh *(2/3))
+            if (touch.position.x  > screenWitdh / 3f && touch.position.x < screenWitdh *2f/3f)
             {
                 horizontalInput = -1f;
+                Debug.Log("left");
             }
-            else if (touch.position.x > screenWitdh *(2/3))
+            else if (touch.position.x > screenWitdh *2/3)
             {
                 horizontalInput = +1f;
+                Debug.Log("right");
+                Debug.Log(playerCanMove);
             }
         }
     }
