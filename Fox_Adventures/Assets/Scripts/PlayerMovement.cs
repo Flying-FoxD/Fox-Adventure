@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     private float sprintBoost;
     private float sprintBoostTimer;
     private float screenWitdh = UnityEngine.Screen.width;
+    private int platform;
     private Animator animator;
     private SpriteRenderer sprite;
     [SerializeField] private ParticleSystem dust;
@@ -28,16 +29,24 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        platform = UnityEngine.Application.platform.GetHashCode();
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
     }
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(platform);
         booster(); 
-        Touchinput();
+        if (platform == 8f || platform == 11f)
+        {
+            Touchinput();
+        }
+        else
+        {
+            playerMovement();
+        }
         playerAnimation();
-        //playerMovement();
         playerFallDown();
     }
     private void FixedUpdate()
@@ -59,23 +68,16 @@ public class PlayerMovement : MonoBehaviour
     private void playerMovement()
     {
         playerCanMove = FindAnyObjectByType<GameManager>().playerAlive;
-        if (UnityEngine.Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            Touchinput();
-            return;
-        }
-        if (playerCanMove)
-        {
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-            if (Input.GetButtonDown("Jump") && IsGrounded())
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpHight  * jumpBoost);
-            }
-            if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
-            {
-               rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-            }
-        }
+
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+         if (Input.GetButtonDown("Jump") && IsGrounded() && playerCanMove)
+         {
+            rb.velocity = new Vector2(rb.velocity.x, jumpHight  * jumpBoost);
+         }
+         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+         {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+         }
     }
 
     private void playerAnimation()
@@ -193,7 +195,7 @@ public class PlayerMovement : MonoBehaviour
         {
             
             playerCanMove = FindAnyObjectByType<GameManager>().playerAlive;
-            if (touch.position.x < screenWitdh / 3f)
+            if (touch.position.x < screenWitdh / 3f && playerCanMove)
             {
                 //jump
                 if (IsGrounded())
