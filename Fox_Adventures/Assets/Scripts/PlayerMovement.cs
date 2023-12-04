@@ -1,11 +1,22 @@
+using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Device;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private enum movementState { idel, running, jumping, falling };
+    private enum MovementState 
+    {
+        idel, 
+        running, 
+        jumping, 
+        falling 
+    };
+
     private int leverFlipped = 0;
     private float horizontalInput;
     private bool playerCanMove;
@@ -17,6 +28,8 @@ public class PlayerMovement : MonoBehaviour
     private int platform;
     private Animator animator;
     private SpriteRenderer sprite;
+    private GameObject go;
+    private SpriteRenderer sr;
     [SerializeField] private ParticleSystem dust;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
@@ -29,6 +42,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        go = new GameObject();
+        sr = GetComponent<SpriteRenderer>();
+        
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
         platform = UnityEngine.Application.platform.GetHashCode();
@@ -36,18 +52,17 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(platform);
-        booster(); 
+        Booster();
         if (platform == 8f || platform == 11f)
         {
-            Touchinput();
+            TouchInput();
         }
         else
         {
-            playerMovement();
+            UpdateMovement();
         }
-        playerAnimation();
-        playerFallDown();
+        PlayerAnimation();
+        PlayerFallDown();
     }
     private void FixedUpdate()
     {
@@ -60,12 +75,19 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(0f, rb.velocity.y);
         }
     }
+    /// <summary>
+    /// only render if TouchScreen is input device
+    /// </summary>
+    private void RenderControls()
+    {
+        
+    }
     //Check for contackt with groundLayer
     private bool IsGrounded()
     {
         return Physics2D.OverlapBox(groundCheck.position, new Vector2(0.7f, 0.5f), 0, groundLayer);
     }
-    private void playerMovement()
+    private void UpdateMovement()
     {
         playerCanMove = FindAnyObjectByType<GameManager>().playerAlive;
 
@@ -80,47 +102,47 @@ public class PlayerMovement : MonoBehaviour
          }
     }
 
-    private void playerAnimation()
+    private void PlayerAnimation()
     {
-        movementState State;
+        MovementState State;
         if (horizontalInput > 0f)
         {
-            State = movementState.running;
+            State = MovementState.running;
             sprite.flipX = false;
         }
         else if (horizontalInput < 0f)
         {
-            State = movementState.running;
+            State = MovementState.running;
             sprite.flipX = true;
         }
         else
         {
-            State = movementState.idel;
+            State = MovementState.idel;
         }
         if (rb.velocity.y > 0.1f)
         {
-            State = movementState.jumping;
+            State = MovementState.jumping;
         }
         else if (rb.velocity.y < -0.1f)
         {
-            State = movementState.falling;
+            State = MovementState.falling;
         }
         if (playerCanMove == false)
         {
-            State = movementState.idel;
+            State = MovementState.idel;
         }
         animator.SetInteger("State", (int)State);
         if ((int)State == 1f)
         {
-            createDust();
+            CreateDust();
         }
     }
-    private void createDust()
+    private void CreateDust()
     {
         dust.Play();
     }
 
-    private void playerFallDown()
+    private void PlayerFallDown()
     {
         if (rb.transform.position.y < -6f && FindAnyObjectByType<GameManager>().playerAlive)
         {
@@ -163,7 +185,7 @@ public class PlayerMovement : MonoBehaviour
         else
             return;
     }
-    private void booster()
+    private void Booster()
     {
         if (jumpBoostTimer > 0f)
         {
@@ -187,7 +209,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Touchinput()
+    private void TouchInput()
     {
         horizontalInput = 0f;
 
