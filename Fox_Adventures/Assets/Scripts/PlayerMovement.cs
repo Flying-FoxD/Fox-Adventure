@@ -29,9 +29,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        platform = UnityEngine.Application.platform.GetHashCode();
         animator = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        platform = UnityEngine.Application.platform.GetHashCode();
     }
     // Update is called once per frame
     void Update()
@@ -207,12 +207,12 @@ public class PlayerMovement : MonoBehaviour
                    //rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
                 }
             }
-            if (touch.position.x  > screenWitdh / 3f && touch.position.x < screenWitdh *2f/3f)
+            if (touch.position.x  > screenWitdh / 3f && touch.position.x < screenWitdh *11f/12f)
             {
                 horizontalInput = -1f;
                 Debug.Log("left");
             }
-            else if (touch.position.x > screenWitdh *2/3)
+            else if (touch.position.x > screenWitdh *11/12)
             {
                 horizontalInput = +1f;
                 Debug.Log("right");

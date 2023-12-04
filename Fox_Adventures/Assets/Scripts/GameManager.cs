@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     private bool scoreTimer;
     private string activeLevel;
     private bool gamePause = false;
+    private int platform;
     [SerializeField] private int restartDelay = 1;
     [SerializeField] private Text playerScore;
     [SerializeField] private Text hiScoreText;
@@ -17,10 +18,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject finishScreen;
     [SerializeField] private GameObject escMenuScreen;
     [SerializeField] private GameObject newHiScoreScreen;
+    [SerializeField] private GameObject TouchSettigs;
 
     private void Awake()
     {
         //PlayerPrefs.DeleteAll();
+        platform = UnityEngine.Application.platform.GetHashCode();
+        if (platform == 8f || platform == 11f)
+        {
+            TouchSettigs.SetActive(true);
+        }
     }
     void Start()
     {
@@ -103,9 +110,9 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("LevelSelection");
     }
-    private void escMenu()
+    public void escMenu()
     {
-        if (gamePause == false)
+        if (gamePause == false && playerAlive)
         {
             playerAlive = false;
             scoreTimer = false;
@@ -114,6 +121,7 @@ public class GameManager : MonoBehaviour
         }
         else if (gamePause)
         {
+            playerAlive = true;
             scoreTimer = true;
             gamePause = false;
             escMenuScreen.SetActive(false);
